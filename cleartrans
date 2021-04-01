@@ -15,15 +15,15 @@ do
     fi   
     for ((n=0; n<=trans_count; n++ ))
     do
-        if [ "${form_binary:n:1}" ==  1 ]
+        if [ "${form_binary:n:1}" ==  1 ] && [ -z "$prices" ]
         then
             price="${amounts[$n]}"
-            if [ -z "$prices" ]
-            then
-                sum="$price"
-            else
-                sum=$(echo "$sum" + "$price" | bc -l)
-            fi
+            sum="$price"
+            prices+="${amounts[$n]} "
+        elif [ "${form_binary:n:1}" ==  1 ]
+        then
+            price="${amounts[$n]}"
+            sum=$(echo "$sum" + "$price" | bc -l)
             prices+="${amounts[$n]} "
         fi
     done
