@@ -1,14 +1,15 @@
 #!/bin/bash
-amounts=( 4.31 2.24 1.00 8.25 7.75 )
+amounts=( 4.50 2.50 1.00 8.00 7.00 )
 trans_count=${#amounts[@]}
-ones=$(eval "printf '1%.0s' {1..$trans_count}")
+for one in $(seq "$trans_count");do ones+="1"; done
 total=$1
 for i in $(seq "$((2#$ones))")
 do
     binary=$(echo "obase=2;$i" | bc)
     if [ "$trans_count" -ne ${#binary} ]
     then
-        form_binary=$(eval "printf '0%.0s' {1..$((trans_count-${#binary}))}")"$binary"
+        for place in $(seq $(($trans_count-${#binary})));do zeros+="0";done
+        form_binary="$zeros""$binary"
     else
         form_binary="$binary"
     fi   
@@ -29,4 +30,5 @@ do
     [ "$sum" == "$total" ] && echo "$prices"
     unset sum
     unset prices
+    unset zeros
 done
