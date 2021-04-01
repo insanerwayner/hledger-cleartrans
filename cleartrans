@@ -1,14 +1,14 @@
 #!/bin/bash
 amounts=( 4.50 2.50 1.00 8.00 7.00 )
 trans_count=${#amounts[@]}
-for one in $(seq "$trans_count");do ones+="1"; done
+until [ ${#ones} -eq "$trans_count" ];do ones+="1"; done
 total=$1
 for i in $(seq "$((2#$ones))")
 do
     binary=$(echo "obase=2;$i" | bc)
     if [ "$trans_count" -ne ${#binary} ]
     then
-        for place in $(seq $(($trans_count-${#binary})));do zeros+="0";done
+        until [ ${#zeros} -eq $(($trans_count-${#binary})) ];do zeros+="0";done
         form_binary="$zeros""$binary"
     else
         form_binary="$binary"
