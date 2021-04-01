@@ -8,7 +8,7 @@ do
     binary=$(echo "obase=2;$i" | bc)
     if [ "$trans_count" -ne ${#binary} ]
     then
-        until [ ${#zeros} -eq $(($trans_count-${#binary})) ];do zeros+="0";done
+        until [ ${#zeros} -eq $((trans_count-${#binary})) ];do zeros+="0";done
         form_binary="$zeros""$binary"
     else
         form_binary="$binary"
