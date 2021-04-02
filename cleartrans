@@ -1,5 +1,5 @@
 #!/bin/bash
-amounts=( 4.50 2.50 1.00 8.00 7.00 13.00 )
+amounts=( 4.50 2.50 1.00 8.00 7.25 13.00 10.00 11.25 2.25 3.75 )
 trans_count=${#amounts[@]}
 until [ ${#ones} -eq "$trans_count" ];do ones+="1"; done
 total=$1
