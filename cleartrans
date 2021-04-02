@@ -1,11 +1,20 @@
 #!/bin/bash
-amounts=( 4.50 2.50 1.00 8.00 7.00 13.00 17.50 19.00 7.50 )
-trans_count=${#amounts[@]}
+amounts=( 4.50 2.50 1.00 8.00 7.00 13.00 )
+export trans_count=${#amounts[@]}
 until [ ${#ones} -eq "$trans_count" ];do ones+="1"; done
-total=$1
-for i in $(seq "$((2#$ones))")
-do
-    binary=$(echo "obase=2;$i" | bc)
+export total=$1
+function get_pattern()
+    {
+    declare -a amounts
+    for i in "$@"
+    do
+        if [ "$count" ]
+        then
+            amounts+=("$i")
+        fi
+        count=1
+    done
+    binary=$(echo "obase=2;$1" | bc)
     if [ "$trans_count" -ne ${#binary} ]
     then
         until [ ${#zeros} -eq $((trans_count-${#binary})) ];do zeros+="0";done
@@ -31,4 +40,9 @@ do
     unset sum
     unset prices
     unset zeros
-done
+    }
+export -f get_pattern
+for i in $(seq "$((2#$ones))")
+do
+    echo "$i"
+done | parallel get_pattern {} "${amounts[*]}" 
