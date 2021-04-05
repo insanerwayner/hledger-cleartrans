@@ -1,8 +1,12 @@
 #!/bin/bash
-amounts=( 4.50 2.50 1.00 8.00 7.25 13.00 10.00 11.25 2.25 3.75 )
+declare -a amounts
+export total=$1
+for amount in $(hledger reg checking -P amt:"<$total" --invert -O csv | awk -F, '{gsub(/"/, ""); gsub(/ USD/, ""); if (NR!=1) {print $(NF-1)}}')
+do
+    amounts+=("$amount")
+done
 export trans_count=${#amounts[@]}
 until [ ${#ones} -eq "$trans_count" ];do ones+="1"; done
-export total=$1
 function get_pattern()
     {
     declare -a amounts
@@ -36,7 +40,15 @@ function get_pattern()
             prices+="${amounts[$n]} "
         fi
     done
-    [ "$sum" == "$total" ] && echo "$prices"
+    if [ "$sum" == "$total" ] 
+    then
+        echo "Possibly Cleared:"
+        echo "-----------------"
+        for price in $prices
+        do
+            hledger reg checking -P amt:"$price"
+        done
+    fi
     unset sum
     unset prices
     unset zeros
