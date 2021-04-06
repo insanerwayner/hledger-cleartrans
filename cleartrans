@@ -27,12 +27,7 @@ function get_pattern()
     do
         if (( "${form_binary:n:1}" ))
         then
-            if (( $(echo "${amounts[$n]} <= $total" | bc -l ) ))
-            then
-                prices+=("${amounts[$n]}")
-            else
-                exit
-            fi
+            prices+=("${amounts[$n]}")
         fi
     done
     sum_formula=$(IFS=+; echo "${prices[*]}")
