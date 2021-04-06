@@ -25,10 +25,7 @@ function get_pattern()
     declare -a prices
     for ((n=0; n<trans_count; n++ ))
     do
-        if (( "${form_binary:n:1}" ))
-        then
-            prices+=("${amounts[$n]}")
-        fi
+        (( "${form_binary:n:1}" )) && prices+=("${amounts[$n]}")
     done
     sum_formula=$(IFS=+; echo "${prices[*]}")
     sum=$(echo "$sum_formula" | bc -l )
