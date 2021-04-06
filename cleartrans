@@ -1,10 +1,17 @@
 #!/bin/bash
 list=( 4.50 2.50 1.00 8.00 7.25 13.00 10.00 11.25 2.25 3.75 2.15 3.85 )
+IFS=$'\n' list=($(sort -V <<<"${list[*]}"))
+unset IFS
 export total=$1
 declare -a amounts
 for amount in ${list[*]}
 do
-    (( $(echo "$amount <= $total" | bc ) )) && amounts+=("$amount")
+    if (( $(echo "$amount <= $total" | bc ) )) 
+    then
+        amounts+=("$amount")
+    else
+        break
+    fi
 done
 export trans_count=${#amounts[@]}
 until [ ${#ones} -eq "$trans_count" ];do ones+="1"; done
