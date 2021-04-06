@@ -1,21 +1,17 @@
 #!/bin/bash
 list=( 4.50 2.50 1.00 8.00 7.25 13.00 10.00 11.25 2.25 3.75 2.15 3.85 )
-IFS=$'\n'  list=($(sort -Vr <<< "${list[*]}"))
+IFS=$'\n'  list=("$(sort -V <<< "${list[*]}")")
 unset IFS
 export total=$1
-declare -a amounts
-for n in $(seq -1 -1 -"${#list[*]}")
+for amount in ${list[*]}
 do
-    amount=${list[$n]}
     if (( $(echo "$amount <= $total" | bc ) )) 
     then
-        amounts+=("$amount")
+        amounts=("$amount" "${amounts[@]}")
     else
         break
     fi
 done
-IFS=$'\n'  amounts=($(sort -Vr <<< "${amounts[*]}"))
-unset IFS
 export trans_count=${#amounts[@]}
 until [ ${#ones} -eq "$trans_count" ];do ones+="1"; done
 export total=$1
