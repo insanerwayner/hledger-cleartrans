@@ -14,7 +14,7 @@ do
         break
     fi
 done
-IFS=$'\n' amounts=("$(sort -Vr <<< "${amounts[*]}")")
+IFS=$'\n'  amounts=($(sort -Vr <<< "${amounts[*]}"))
 unset IFS
 export trans_count=${#amounts[@]}
 until [ ${#ones} -eq "$trans_count" ];do ones+="1"; done
