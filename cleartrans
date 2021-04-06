@@ -43,7 +43,6 @@ function get_pattern()
         if (( "${form_binary:n:1}" ))
         then
             price="${amounts[$n]}"
-            if (( $(echo "$price > $total" | bc -l) )); then exit;fi
             if [ -z "$prices" ]
             then
                 sum="$price"
