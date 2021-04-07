@@ -6,7 +6,7 @@ export total=$1
 declare -a amounts
 for amount in ${list[*]}
 do
-    if (( $(echo "$amount <= $total" | bc ) )) 
+    if (( $(echo "$amount <= $total" | bc -l ) )) 
     then
         amounts+=("$amount")
     else
