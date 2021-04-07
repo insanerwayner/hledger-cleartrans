@@ -1,6 +1,9 @@
 #!/bin/bash
 declare -a amounts
-export total=$1
+bankbal=$1
+ledgbal=$(hledger bal checking -RC --format "%(total)" | tail -n1 | sed 's/ USD//g')
+total=$(echo "$bankbal-$ledgbal" | bc -l)
+export total
 for amount in $(hledger reg checking -P amt:"<$total" --invert -O csv | awk -F, '{gsub(/"/, ""); gsub(/ USD/, ""); if (NR!=1) {print $(NF-1)}}')
 do
     amounts+=("$amount")
