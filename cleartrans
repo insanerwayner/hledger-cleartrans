@@ -26,32 +26,22 @@ function get_pattern()
     else
         form_binary="$binary"
     fi   
-    for ((n=0; n<=trans_count; n++ ))
+    declare -a prices
+    for ((n=0; n<trans_count; n++ ))
     do
-        if [ "${form_binary:n:1}" ==  1 ]
-        then
-            price="${amounts[$n]}"
-            if [ -z "$prices" ]
-            then
-                sum="$price"
-            else
-                sum=$(echo "$sum" + "$price" | bc -l)
-            fi
-            prices+="${amounts[$n]} "
-        fi
+        (( "${form_binary:n:1}" )) && prices+=("${amounts[$n]}")
     done
+    sum_formula=$(IFS=+; echo "${prices[*]}")
+    sum=$(echo "$sum_formula" | bc -l )
     if [ "$sum" == "$total" ] 
     then
         echo "Possibly Cleared:"
         echo "-----------------"
-        for price in $prices
+        for price in ${prices[*]}
         do
             hledger reg checking -P amt:"$price"
         done
     fi
-    unset sum
-    unset prices
-    unset zeros
     }
 export -f get_pattern
 seq "$((2#$ones))" | parallel get_pattern {} "${amounts[*]}" 
