@@ -44,4 +44,4 @@ function get_pattern()
     [ "$sum" == "$total" ] && echo "${prices[*]}"
     }
 export -f get_pattern
-seq "$((2#$ones))" | parallel get_pattern {} "${amounts[*]}" 
+parallel get_pattern {} "${amounts[*]}" <<< $(seq "$((2#$ones))")
