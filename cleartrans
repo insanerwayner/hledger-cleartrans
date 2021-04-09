@@ -6,7 +6,7 @@ export total=$1
 declare -a amounts
 for amount in ${list[*]}
 do
-    if (( $(echo "$amount <= $total" | bc -l ) )) 
+    if (( $(bc -l <<< "$amount <= $total") )) 
     then
         amounts+=("$amount")
     else
@@ -26,7 +26,7 @@ function get_pattern()
         fi
         count=1
     done
-    binary=$(echo "obase=2;$1" | bc)
+    binary=$(bc <<< "obase=2;$1" )
     if [ "$trans_count" -ne ${#binary} ]
     then
         until [ ${#zeros} -eq $((trans_count-${#binary})) ];do zeros+="0";done
@@ -40,7 +40,7 @@ function get_pattern()
         (( "${form_binary:n:1}" )) && prices+=("${amounts[$n]}")
     done
     sum_formula=$(IFS=+; echo "${prices[*]}")
-    sum=$(echo "$sum_formula" | bc -l )
+    sum=$(bc -l <<< "$sum_formula")
     [ "$sum" == "$total" ] && echo "${prices[*]}"
     }
 export -f get_pattern
