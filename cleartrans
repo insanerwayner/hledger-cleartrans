@@ -2,8 +2,9 @@
 declare -a amounts
 bankbal=$1
 ledgbal=$(hledger bal checking -RC --format "%(total)" | tail -n1 | sed 's/ USD//g')
-total=$(echo "$bankbal-$ledgbal" | bc -l)
+total=$(echo "$ledgbal-$bankbal" | bc -l)
 [ "$total" == 0 ] && echo "Balance is Reconciled" && exit
+(( $( echo "$total < 0" | bc -l ) )) && echo "Enter bank balance" && exit
 printf  "Total Diff: %s USD \n\n" "$total"
 export total
 for amount in $(hledger reg checking -P amt:"<=$total" --invert -O csv | awk -F, '{gsub(/"/, ""); gsub(/ USD/, ""); if (NR!=1) {print $(NF-1)}}')
