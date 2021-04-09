@@ -2,9 +2,9 @@
 declare -a amounts
 bankbal=$1
 ledgbal=$(hledger bal checking -RC --format "%(total)" | tail -n1 | sed 's/ USD//g')
-total=$(echo "$ledgbal-$bankbal" | bc -l)
+total=$(bc -l <<< "$ledgbal-$bankbal")
 [ "$total" == 0 ] && echo "Balance is Reconciled" && exit
-(( $( echo "$total < 0" | bc -l ) )) && echo "Enter bank balance" && exit
+(( $( bc -l <<< "$total < 0") )) && echo "Enter bank balance" && exit
 printf  "Total Diff: %s USD \n\n" "$total"
 export total
 for amount in $(hledger reg checking -P amt:"<=$total" --invert -O csv | awk -F, '{gsub(/"/, ""); gsub(/ USD/, ""); if (NR!=1) {print $(NF-1)}}')
@@ -24,7 +24,7 @@ function get_pattern()
         fi
         count=1
     done
-    binary=$(echo "obase=2;$1" | bc)
+    binary=$( bc <<< "obase=2;$1")
     if [ "$trans_count" -ne ${#binary} ]
     then
         until [ ${#zeros} -eq $((trans_count-${#binary})) ];do zeros+="0";done
@@ -38,7 +38,7 @@ function get_pattern()
         (( "${form_binary:n:1}" )) && prices+=("${amounts[$n]}")
     done
     sum_formula=$(IFS=+; echo "${prices[*]}")
-    sum=$(echo "$sum_formula" | bc -l )
+    sum=$(bc -l <<< "$sum_formula" )
     if [ "$sum" == "$total" ] 
     then
         echo "Possibly Cleared:"
