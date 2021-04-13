@@ -7,7 +7,7 @@ total=$(bc -l <<< "$ledgbal-$bankbal")
 (( $( bc -l <<< "$total < 0") )) && echo "Enter bank balance" && exit
 printf  "Total Diff: %s USD \n\n" "$total"
 export total
-for amount in $(hledger reg checking -P amt:"<=$total" --invert -O csv | awk -F, '{gsub(/"/, ""); gsub(/ USD/, ""); if (NR!=1) {print $(NF-1)}}')
+for amount in $(hledger reg checking amt:"<=$total" --invert -P -O csv | awk -F, '{gsub(/ USD/, ""); if (NR!=1) {print $2":"$4":"$(NF-1)}}')
 do
     amounts+=("$amount")
 done
@@ -33,20 +33,30 @@ function get_pattern()
         form_binary="$binary"
     fi   
     declare -a prices
+    declare -a dates
+    declare -a descriptions
     for ((n=0; n<trans_count; n++ ))
     do
-        (( "${form_binary:n:1}" )) && prices+=("${amounts[$n]}")
+        if (( "${form_binary:n:1}" ))
+        then
+            trans="${amounts[$n]}"
+            prices+=("$(cut -d: -f 3 <<<"$trans")")
+            dates+=("$(cut -d: -f 1 <<<"$trans")")
+            descriptions+=("$(cut -d: -f 2 <<<"$trans")")
+        fi
     done
     sum_formula=$(IFS=+; echo "${prices[*]}")
     sum=$(bc -l <<< "$sum_formula" )
+    unset IFS
     if [ "$sum" == "$total" ] 
     then
         echo "Possibly Cleared:"
         echo "-----------------"
-        for price in ${prices[*]}
+        for tran in $(seq 0 $(("${#prices[@]}"-1)))
         do
-            hledger reg checking -P amt:"$price"
+            hledger reg checking -P amt:"${prices[$tran]}" desc:"${descriptions[$tran]}" -p "${dates[$tran]}"
         done
+        echo ""
     fi
     }
 export -f get_pattern
