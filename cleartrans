@@ -33,9 +33,6 @@ function get_pattern()
     else
         form_binary="$binary"
     fi   
-    declare -a prices
-    declare -a dates
-    declare -a descriptions
     for ((n=0; n<trans_count; n++ ))
     do
         if (( "${form_binary:n:1}" ))
