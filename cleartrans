@@ -1,7 +1,21 @@
 #!/bin/bash
 declare -a amounts
 bankbal=$1
+savbal=$2
 ledgbal=$(hledger bal checking -RC --format "%(total)" | tail -n1 | sed 's/ USD//g')
+sledgbal=$(hledger bal Assets:BofTX:Savings -RC --format "%(total)" | tail -n1 | sed 's/ USD//g')
+sdiff=$(bc -l <<< "$savbal-$sledgbal")
+if [ "$sdiff" != 0 ]
+then
+    if [ "$(bc -l <<< "scale=0;$sdiff % 0.25")" == 0 ]
+    then
+        printf "Possible quicksave entries missing in the amount of %s USD.\nProceeding with this assumption.\n\n" "$sdiff"
+        bankbal=$(bc -l <<< "$bankbal+$sdiff")
+    else
+        echo "Savings balance is off with the amout of $sdiff USD" 
+        exit
+    fi
+fi
 total=$(bc -l <<< "$ledgbal-$bankbal")
 [ "$total" == 0 ] && echo "Balance is Reconciled" && exit
 (( $( bc -l <<< "$total < 0") )) && echo "Enter bank balance" && exit
