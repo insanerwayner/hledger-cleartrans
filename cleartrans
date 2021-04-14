@@ -1,7 +1,19 @@
 #!/bin/bash
 declare -a amounts
-bankbal=$1
-savbal=$2
+if [ -z "$1" ] && [ -z "$2" ]
+then
+    read -rp "Checking Balance: " bankbal
+    read -rp "Savings Balance: " savbal
+    printf "\n"
+elif [ -z "$2" ]
+then
+    bankbal=$1
+    read -rp "Savings Balance: " savbal
+    printf "\n"
+else
+    bankbal=$1
+    savbal=$2
+fi
 ledgbal=$(hledger bal checking -RC --format "%(total)" | tail -n1 | sed 's/ USD//g')
 sledgbal=$(hledger bal Assets:BofTX:Savings -RC --format "%(total)" | tail -n1 | sed 's/ USD//g')
 sdiff=$(bc -l <<< "$savbal-$sledgbal")
